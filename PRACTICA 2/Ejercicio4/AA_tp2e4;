@@ -1,0 +1,97 @@
+//pedir correccion 
+
+{Se cuenta con un archivo de productos de una cadena de venta de alimentos congelados.
+De cada producto se almacena: código del producto, nombre, descripción, stock disponible,
+stock mínimo y precio del producto.
+Se recibe diariamente un archivo detalle de cada una de las 30 sucursales de la cadena. Se
+debe realizar el procedimiento que recibe los 30 detalles y actualiza el stock del archivo
+maestro. La información que se recibe en los detalles es: código de producto y cantidad
+vendida. Además, se deberá informar en un archivo de texto: nombre de producto,
+descripción, stock disponible y precio de aquellos productos que tengan stock disponible por
+debajo del stock mínimo. Pensar alternativas sobre realizar el informe en el mismo
+procedimiento de actualización, o realizarlo en un procedimiento separado (analizar
+ventajas/desventajas en cada caso).
+Nota: todos los archivos se encuentran ordenados por código de productos. En cada detalle
+puede venir 0 o N registros de un determinado producto.}
+Program tp2e4;
+const
+	DF = 3; //30
+Type
+	subrango = 1..DF;
+	producto = record
+		cod: integer;
+		nombre: string;
+		desc: string;
+		stock: integer;
+		stock_min: integer;
+		precio: real;
+	end;
+	
+	sucursales = record
+		cod: integer;
+		cantidad: integer;
+	end;
+	
+	maestro = file of producto;
+	detalle = file of sucursales;
+	
+	vecDetalles = array [subrango] of detalle;
+Procedure leer (var mae: maestro; var reg: producto);
+begin
+		if (not(eof(mae))) then
+			read(mae, reg);
+		else
+			reg.cod = 9999;
+end;
+//PREGUNTAR COMENTARIO ENTRE LLAVES
+Procedure actualizarMaestro (var mae: maestro; var vec: vecDetalles);
+var
+	datos: producto;
+	reg: sucursales;
+begin
+	reset(mae);
+	for i:= 1 to DF do 
+		reset(vec[i]);
+	leer(mae,datos);
+	while (datos.cod <> 9999) do begin
+		for i:= 1 to DF do begin
+			while (not(eof(v[i]))) then begin
+				read(v[i], reg);
+				if (datos.cod = v[i].reg.cod) then
+					datos.stock:= datos.stock - reg.cantidad;
+			end;
+		end;
+		seek(mae, filepos()-1);
+		{if datos.stock < datos.stock_min then
+			crear detalle de tipo txt}
+		write(mae, datos);
+		leer(mae, datos);
+	end;
+	writeln('Archivo maestro actualizado!');
+	close(mae);
+	for i:= 1 to DF do 
+		close(v[i]);
+end;
+Procedure varStock (var mae:maestro; var txt: text);
+var
+	name: string;
+	datos:producto;
+begin
+	wirte('Ingrese nombre para el archivo TXT: ');
+	read(name);
+	assign(txt, name);
+	rewrite(txt);
+	reset(mae);
+	leer(mae, datos);
+	while (datos.cod <> 9999) do begin
+		if (datos.stock < datos.stock_min) then begin
+			writeln (txt, datos.nombre);
+			writeln(txt, datos.desc);
+			writeln(txt, datos.stock, datos.precio);
+		end;
+		leer(mae, datos);
+	end;
+	writeln('Archivo TXT con los stock creado!');
+	close(mae);
+	close(txt);
+end;
