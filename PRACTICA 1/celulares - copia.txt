@@ -1,0 +1,21 @@
+123 1200.00 Apple
+45 6 IPhone 16
+U1
+234 456.00 Samsung
+6 53 Samsung Galaxy S7
+U2
+345 789.90 Apple
+34 5 IPhone 14
+U3
+456 123.30 Nokia
+0 4 Nokia
+U4
+567 484.00 Apple
+2 5 Ipad
+U5
+678 453.45 Huawei
+0 1 Huawei promedio
+U6
+789 564.70 Huawei XT
+1 7 Huawei promedio
+U7
