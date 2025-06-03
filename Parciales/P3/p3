@@ -1,0 +1,69 @@
+Program recorridos;
+Const
+	valorAlto = 999999;
+Type
+	prestamo = record
+		sucursal: LongInt;
+		DNI: LongInt;
+		nro: LongInt;
+		fecha: String;
+		monto: real;
+	end;
+	
+	archivo = file of prestamo;
+	
+procedure leerArchivo (var a: archivo; var reg: prestamo);
+begin
+	if (not eof(a)) then
+		read(a, reg)
+	else
+		reg.sucursal := valorAlto;
+end;
+procedure generarInforme (var a: archivo; var txt: text);
+var
+	reg: prestamo;
+	anio, ventas, actFecha: integer;
+	monto: real;
+	actSuc, actDNI: LongInt;
+begin
+	reset(a);
+	assign(txt 'Informe.txt');
+	rewrite(txt);
+	
+	write(txt,'Informe de ventas de la empresa');
+	
+	leerArchivo(a, reg);
+	while (reg.sucursal <> valorAlto) do begin
+		actSuc := reg.sucursal;
+		writeln(txt, 'Sucursal ',actSuc);
+		
+		while (reg.sucursal = actSuc) do begin
+			actDNI := reg.DNI;
+			write(txt, 'Empleado: DNI ',actDNI);
+			write(txt, 'Año		','Cantidad de ventas	','Monto de ventas	');
+			
+			while ((reg.DNI = actDNI) and (reg.sucursal = actSuc)) do begin
+				actFecha := extraerAño(reg.fecha);
+				ventas := 0;
+				monto := 0;
+
+				while ((anio = actFecha) and (reg.DNI = actDNI) and (reg.sucursal = actSuc)) do begin
+					ventas := ventas + 1;
+					monto := monto + reg.monto;
+					leerArchivo(a, reg);
+					anio := extraerAño(reg.fecha);
+				end;
+				write(txt, actFecha,'	',ventas,'	',monto:0:2);
+			end;
+		end;
+	end;
+	close(a);
+	close(txt);
+end;
+Var
+	a: archivo;
+	t: text;
+Begin
+	generarInforme(a, t);
+	writeln('Informe creado con exito!');
+End.
